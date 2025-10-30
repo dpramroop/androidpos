@@ -19,3 +19,15 @@ interface MenuDao {
     @Query("Select * From Menu")
     fun getAllMenu():Flow<List<Menu>>
 }
+
+@Dao
+interface UserDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertUser(user: User)
+
+    @Delete
+    suspend fun deleteMenu(user: User)
+
+    @Query("Select * From User")
+    fun getAllUser():Flow<List<User>>
+}

@@ -12,3 +12,13 @@ data class Menu(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
 )
+
+@Entity
+data class User(
+
+    val user:String,
+    val email:String,
+    val password: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0
+)

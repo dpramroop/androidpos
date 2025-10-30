@@ -117,6 +117,7 @@ fun LScreen(onBack: () -> Unit)
     val mm: MenuDao=db.dao
 
 
+
      val  menuList by mm.getAllMenu().collectAsState(initial = emptyList())
 
     Column {
