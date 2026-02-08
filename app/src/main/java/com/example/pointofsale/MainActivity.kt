@@ -10,8 +10,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RestrictTo.Scope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
@@ -34,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -121,21 +124,30 @@ fun LScreen(onBack: () -> Unit)
      val  menuList by mm.getAllMenu().collectAsState(initial = emptyList())
 
     Column {
+        Button(onClick = onBack) {
+            Text("Back")
+        }
         Button(onClick = { showDialog = true }) {
-            Text("Show Custom Dialog")
+            Text("Add Menu")
         }
 
         if (showDialog) {
             CustomModalDialog(onDismissRequest = { showDialog = false })
         }
 
-        Text("Hello from LScreen")
-        Button(onClick = onBack) {
-            Text("Go to FScreen")
-        }
+        Text("List of Menu")
+
         LazyColumn {
             itemsIndexed(menuList) { index, menu ->
-                Text(menu.item_name)
+                Row(modifier = Modifier.fillMaxWidth().height(50.dp),
+                    horizontalArrangement = Arrangement.Absolute.SpaceEvenly, // Distributes space evenly
+                    verticalAlignment = Alignment.CenterVertically){
+                    Text(menu.id.toString())
+                    Text(menu.item_name)
+                    Text(menu.item_type)
+                    Text(menu.cost.toString())
+                }
+
             }
         }
 
@@ -191,7 +203,6 @@ fun CustomModalDialog(onDismissRequest: () -> Unit) {
                 onValueChange = { item_type.value = it },
                 label = { Text("Enter item type") },
                 placeholder = { Text("Fruit") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -202,6 +213,7 @@ fun CustomModalDialog(onDismissRequest: () -> Unit) {
                 onValueChange = { cost.value = it.toString().toDouble() },
                 label = { Text("Cost") },
                 placeholder = { Text("Fruit") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
