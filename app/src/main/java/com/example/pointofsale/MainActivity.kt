@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RestrictTo.Scope
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import androidx.room.Room
 import com.example.pointofsale.ui.theme.PointOfSaleTheme
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +69,17 @@ class MainActivity : ComponentActivity() {
                     }
                     composable<LScreenRoute> {
                         LScreen(
+                            onBack = { navcontroller.popBackStack()},
+                            onNext = { farmId ->
+                                navcontroller.navigate(PenScreenRoute(farmId))
+                            }
+                        )
+                    }
+                    composable<PenScreenRoute> { backStackEntry ->
+                        val args = backStackEntry.toRoute<PenScreenRoute>()
+
+                        PenScreen(
+                            farmId = args.farmId,
                             onBack = { navcontroller.popBackStack() }
                         )
                     }
@@ -83,6 +96,10 @@ object FScreenRoute
 @Serializable
 object LScreenRoute
 
+
+@Serializable
+data class PenScreenRoute(val farmId: Int)
+
 @Composable
 fun FScreen(onNext: () -> Unit)
 {
@@ -90,24 +107,16 @@ fun FScreen(onNext: () -> Unit)
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Button(onClick = onNext,   colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)){
-            Text("Menu")
+            Text("Farm")
 
         }
-        Button(onClick = {}){
-            Text("Customer")
-        }
-        Button(onClick = {}){
-            Text("POS")
-        }
-        Button(onClick = {}){
-            Text("Report")
-        }
+
     }
 
 }
 
 @Composable
-fun LScreen(onBack: () -> Unit)
+fun LScreen(onBack: () -> Unit, onNext: (Int) -> Unit)
 {  var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val db = remember {
@@ -117,35 +126,39 @@ fun LScreen(onBack: () -> Unit)
             "menu.db"
         ).build()
     }
-    val mm: MenuDao=db.dao
+    val mm: FarmDao=db.dao
 
 
 
-     val  menuList by mm.getAllMenu().collectAsState(initial = emptyList())
+     val  farmList by mm.getAllFarm().collectAsState(initial = emptyList())
 
     Column {
         Button(onClick = onBack) {
             Text("Back")
         }
         Button(onClick = { showDialog = true }) {
-            Text("Add Menu")
+            Text("Add Farm")
         }
 
         if (showDialog) {
             CustomModalDialog(onDismissRequest = { showDialog = false })
         }
 
-        Text("List of Menu")
+        Text("List of Farms")
 
         LazyColumn {
-            itemsIndexed(menuList) { index, menu ->
-                Row(modifier = Modifier.fillMaxWidth().height(50.dp),
+            itemsIndexed(farmList) { index, farm ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(50.dp).clickable{
+                        onNext(farm.id)
+                    },
                     horizontalArrangement = Arrangement.Absolute.SpaceEvenly, // Distributes space evenly
-                    verticalAlignment = Alignment.CenterVertically){
-                    Text(menu.id.toString())
-                    Text(menu.item_name)
-                    Text(menu.item_type)
-                    Text(menu.cost.toString())
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(farm.id.toString())
+                    Text(farm.farm_name)
+                    Text(farm.address)
+
                 }
 
             }
@@ -161,6 +174,62 @@ fun LScreen(onBack: () -> Unit)
 }
 
 @Composable
+fun PenScreen(onBack: () -> Unit,farmId: Int)
+{  var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val db = remember {
+        Room.databaseBuilder(
+            context,
+            MenuDatabase::class.java,
+            "menu.db"
+        ).build()
+    }
+    val mm: FarmDao=db.dao
+
+
+
+    val  farmList by mm.getAllFarm().collectAsState(initial = emptyList())
+
+    Column {
+        Text("Farm ID: $farmId")
+        Button(onClick = onBack) {
+            Text("Back")
+        }
+        Button(onClick = { showDialog = true }) {
+            Text("Add Pen")
+        }
+
+        if (showDialog) {
+            CustomModalDialog(onDismissRequest = { showDialog = false })
+        }
+
+        Text("List of Farms")
+
+        LazyColumn {
+            itemsIndexed(farmList) { index, farm ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(50.dp).clickable{
+
+                    },
+                    horizontalArrangement = Arrangement.Absolute.SpaceEvenly, // Distributes space evenly
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(farm.id.toString())
+                    Text(farm.farm_name)
+                    Text(farm.address)
+
+                }
+
+            }
+        }
+
+
+    }
+
+
+}
+
+@Composable
 fun CustomModalDialog(onDismissRequest: () -> Unit) {
     Dialog(onDismissRequest = onDismissRequest) {
         // Content of your custom dialog
@@ -171,9 +240,9 @@ fun CustomModalDialog(onDismissRequest: () -> Unit) {
         val context = LocalContext.current
         var number=remember { mutableStateOf(2) }
         val coroutineScope = rememberCoroutineScope()
-        var item_name = remember { mutableStateOf("") }
-        var item_type = remember { mutableStateOf("") }
-        var cost = remember { mutableStateOf(0.0) }
+        var farm_name = remember { mutableStateOf("") }
+        var address = remember { mutableStateOf("") }
+
         val db = remember {
             Room.databaseBuilder(
                 context,
@@ -181,7 +250,7 @@ fun CustomModalDialog(onDismissRequest: () -> Unit) {
                 "menu.db"
             ).build()
         }
-        val mm: MenuDao=db.dao
+        val mm: FarmDao=db.dao
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -189,8 +258,8 @@ fun CustomModalDialog(onDismissRequest: () -> Unit) {
         ) {
 
             TextField(
-                value = item_name.value,
-                onValueChange = { item_name.value = it },
+                value = farm_name.value,
+                onValueChange = { farm_name.value = it },
                 label = { Text("Enter item name") },
                 placeholder = { Text("Mango") },
                 singleLine = true,
@@ -199,8 +268,8 @@ fun CustomModalDialog(onDismissRequest: () -> Unit) {
 
             )
             TextField(
-                value = item_type.value,
-                onValueChange = { item_type.value = it },
+                value = address.value,
+                onValueChange = { address.value = it },
                 label = { Text("Enter item type") },
                 placeholder = { Text("Fruit") },
                 singleLine = true,
@@ -208,23 +277,13 @@ fun CustomModalDialog(onDismissRequest: () -> Unit) {
                     .fillMaxWidth()
 
             )
-            TextField(
-                value = cost.value.toString(),
-                onValueChange = { cost.value = it.toString().toDouble() },
-                label = { Text("Cost") },
-                placeholder = { Text("Fruit") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
 
-            )
 
             Button(onClick = {
 
                 coroutineScope.launch {
 
-                    mm.upsertMenu(Menu(item_name.value,item_type.value,cost.value))
+                    mm.upsertFarm(Farm(farm_name.value,address.value))
 
 //                number.value=+1
                 }

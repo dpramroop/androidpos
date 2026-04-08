@@ -2,28 +2,22 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "7ce7ca13c57849e3c8ec0e24ac731574",
+    "identityHash": "f50c41ebc2563f72e5541e1055de7c42",
     "entities": [
       {
-        "tableName": "Menu",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`item_name` TEXT NOT NULL, `item_type` TEXT NOT NULL, `cost` REAL NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "tableName": "Farm",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`farm_name` TEXT NOT NULL, `address` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
         "fields": [
           {
-            "fieldPath": "item_name",
-            "columnName": "item_name",
+            "fieldPath": "farm_name",
+            "columnName": "farm_name",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "item_type",
-            "columnName": "item_type",
+            "fieldPath": "address",
+            "columnName": "address",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "cost",
-            "columnName": "cost",
-            "affinity": "REAL",
             "notNull": true
           },
           {
@@ -79,7 +73,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7ce7ca13c57849e3c8ec0e24ac731574')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f50c41ebc2563f72e5541e1055de7c42')"
     ]
   }
 }

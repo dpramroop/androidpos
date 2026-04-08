@@ -9,24 +9,35 @@ import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface MenuDao {
+interface FarmDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertMenu(menu: Menu)
+    suspend fun upsertFarm(farm: Farm)
 
     @Delete
-    suspend fun deleteMenu(menu: Menu)
+    suspend fun deleteFarm(farm: Farm)
 
-    @Query("Select * From Menu")
-    fun getAllMenu():Flow<List<Menu>>
+    @Query("Select * From Farm")
+    fun getAllFarm():Flow<List<Farm>>
 }
 
+@Dao
+interface PenDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertPen(pen: Pen)
+
+    @Delete
+    suspend fun deletePen(pen: Pen)
+
+    @Query("Select * From Pen where farm_id=farm_id")
+    fun getAllPens(farm_id:Int):Flow<List<Pen>>
+}
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertUser(user: User)
 
     @Delete
-    suspend fun deleteMenu(user: User)
+    suspend fun deleteUser(user: User)
 
     @Query("Select * From User")
     fun getAllUser():Flow<List<User>>
