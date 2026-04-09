@@ -28,9 +28,46 @@ interface PenDao {
     @Delete
     suspend fun deletePen(pen: Pen)
 
-    @Query("Select * From Pen where farm_id=farm_id")
+    @Query("Select * From Pen where farm_id=:farm_id")
     fun getAllPens(farm_id:Int):Flow<List<Pen>>
 }
+
+@Dao
+interface BatchDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertPen(pen: Pen)
+
+    @Delete
+    suspend fun deletePen(pen: Pen)
+
+    @Query("Select * From Pen where farm_id=:farm_id")
+    fun getAllPens(farm_id:Int):Flow<List<Pen>>
+}
+
+@Dao
+interface MortalityDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertPen(pen: Pen)
+
+    @Delete
+    suspend fun deletePen(pen: Pen)
+
+    @Query("Select * From Pen where farm_id = :farm_id")
+    fun getAllPens(farm_id:Int):Flow<List<Pen>>
+}
+
+@Dao
+interface FeedDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertPen(pen: Pen)
+
+    @Delete
+    suspend fun deletePen(pen: Pen)
+
+    @Query("Select * From Pen where farm_id=:farm_id")
+    fun getAllPens(farm_id:Int):Flow<List<Pen>>
+}
+
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

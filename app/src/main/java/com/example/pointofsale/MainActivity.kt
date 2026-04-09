@@ -1,13 +1,9 @@
 package com.example.pointofsale
 
-import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RestrictTo.Scope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.compose.NavHost
@@ -45,12 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.room.Room
 import com.example.pointofsale.ui.theme.PointOfSaleTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
@@ -96,9 +84,10 @@ object FScreenRoute
 @Serializable
 object LScreenRoute
 
-
 @Serializable
-data class PenScreenRoute(val farmId: Int)
+data class Farm_ser(val id:Int,val name: String, val address: String)
+@Serializable
+data class PenScreenRoute(val farmId: Farm_ser)
 
 @Composable
 fun FScreen(onNext: () -> Unit)
@@ -116,7 +105,7 @@ fun FScreen(onNext: () -> Unit)
 }
 
 @Composable
-fun LScreen(onBack: () -> Unit, onNext: (Int) -> Unit)
+fun LScreen(onBack: () -> Unit, onNext: (Farm_ser) -> Unit)
 {  var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val db = remember {
@@ -150,7 +139,7 @@ fun LScreen(onBack: () -> Unit, onNext: (Int) -> Unit)
             itemsIndexed(farmList) { index, farm ->
                 Row(
                     modifier = Modifier.fillMaxWidth().height(50.dp).clickable{
-                        onNext(farm.id)
+                        onNext(Farm_ser(farm.id,farm.farm_name,farm.address))
                     },
                     horizontalArrangement = Arrangement.Absolute.SpaceEvenly, // Distributes space evenly
                     verticalAlignment = Alignment.CenterVertically
@@ -174,7 +163,7 @@ fun LScreen(onBack: () -> Unit, onNext: (Int) -> Unit)
 }
 
 @Composable
-fun PenScreen(onBack: () -> Unit,farmId: Int)
+fun PenScreen(onBack: () -> Unit, farmId: Farm_ser)
 {  var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val db = remember {
@@ -184,14 +173,14 @@ fun PenScreen(onBack: () -> Unit,farmId: Int)
             "menu.db"
         ).build()
     }
-    val mm: FarmDao=db.dao
+    val mm: PenDao=db.penDao
 
 
 
-    val  farmList by mm.getAllFarm().collectAsState(initial = emptyList())
+    val  penList by mm.getAllPens(farmId.id).collectAsState(initial = emptyList())
 
     Column {
-        Text("Farm ID: $farmId")
+        Text("Farm ID: ${farmId.name}")
         Button(onClick = onBack) {
             Text("Back")
         }
@@ -200,13 +189,13 @@ fun PenScreen(onBack: () -> Unit,farmId: Int)
         }
 
         if (showDialog) {
-            CustomModalDialog(onDismissRequest = { showDialog = false })
+            InsertPenDialog(onDismissRequest = { showDialog = false },farmId)
         }
 
-        Text("List of Farms")
+        Text("List of Pens")
 
         LazyColumn {
-            itemsIndexed(farmList) { index, farm ->
+            itemsIndexed(penList) { index, pen ->
                 Row(
                     modifier = Modifier.fillMaxWidth().height(50.dp).clickable{
 
@@ -214,9 +203,9 @@ fun PenScreen(onBack: () -> Unit,farmId: Int)
                     horizontalArrangement = Arrangement.Absolute.SpaceEvenly, // Distributes space evenly
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    Text(farm.id.toString())
-                    Text(farm.farm_name)
-                    Text(farm.address)
+                    Text(pen.id.toString())
+                    Text(pen.pen_name)
+
 
                 }
 

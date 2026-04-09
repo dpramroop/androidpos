@@ -2,9 +2,8 @@ package com.example.pointofsale
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.sql.Date
 
-@Entity
+@Entity(tableName = "farm")
 data class Farm(
 
     val farm_name:String,
@@ -13,7 +12,7 @@ data class Farm(
     val id: Int = 0
 )
 
-@Entity
+@Entity (tableName = "pen")
 data class Pen(
     val farm_id:Int,
     val pen_name:String,
@@ -22,7 +21,7 @@ data class Pen(
 )
 
 
-@Entity
+@Entity(tableName = "batch")
 data class Batch(
     val pen_id: Int,
     val chick_amt:Int,
@@ -32,7 +31,7 @@ data class Batch(
     val id: Int = 0
 )
 
-@Entity
+@Entity(tableName = "mortality_record")
 data class Mortality_Record(
     val batch_id: Int,
     val chick_amt:Int,
@@ -41,7 +40,7 @@ data class Mortality_Record(
     val id: Int = 0
 )
 
-@Entity
+@Entity (tableName = "feed_record")
 data class Feed_Record(
     val batch_id: Int,
     val feed_amt:Int,
@@ -50,7 +49,7 @@ data class Feed_Record(
     val id: Int = 0
 )
 
-@Entity
+@Entity (tableName = "user")
 data class User(
 
     val user:String,

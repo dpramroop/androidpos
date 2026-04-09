@@ -19,7 +19,7 @@ import androidx.room.Room
 import kotlinx.coroutines.launch
 
 @Composable
-fun InsertPenDialog(onDismissRequest: () -> Unit,farm: Farm) {
+fun InsertPenDialog(onDismissRequest: () -> Unit,farm: Farm_ser) {
     Dialog(onDismissRequest = onDismissRequest) {
         // Content of your custom dialog
         // You would typically use a Surface or Card to give it a visual structure
@@ -63,7 +63,7 @@ fun InsertPenDialog(onDismissRequest: () -> Unit,farm: Farm) {
 
                 coroutineScope.launch {
 
-                    mm.upsertPen(farm.id,pen_name.value))
+                    mm.upsertPen(Pen(farm_id = farm.id,pen_name.value))
 
 //                number.value=+1
                 }
